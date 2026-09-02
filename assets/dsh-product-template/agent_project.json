@@ -1,0 +1,86 @@
+{
+  "schema": "agent-workbench-project/v4",
+  "project": {
+    "slug": __PROJECT_SLUG_JSON__,
+    "title": __PROJECT_TITLE_JSON__,
+    "kind": __PROJECT_PRODUCT_KIND_JSON__,
+    "originalityStatement": "This project owns its product purpose, capability boundaries, representative scenarios, evidence, and business outputs; it does not copy Xiaoshe branding or workflows."
+  },
+  "product": {
+    "purpose": __PROJECT_PURPOSE_JSON__,
+    "primaryUsers": __PROJECT_PRIMARY_USERS_JSON__
+  },
+  "capabilities": __PROJECT_CAPABILITIES_JSON__,
+  "acceptanceScenarios": __PROJECT_SCENARIOS_JSON__,
+  "runtime": {
+    "kind": "external-dsh",
+    "officialRepository": "https://github.com/deepseek-ai/deepseek-harness",
+    "testedVersion": "0.1.0-rc.8",
+    "bundled": false,
+    "profile": "web",
+    "bundleManifest": "package.json"
+  },
+  "development": {
+    "stage": "starter",
+    "domainEvidence": {
+      "fixtures": "fixtures/domain-cases.json",
+      "report": "evidence/domain-adaptation.json",
+      "test": "tests/domain-fixtures.test.mjs"
+    },
+    "criticalFiles": [
+      "src/capabilities.mjs",
+      "fixtures/domain-cases.json",
+      "tests/domain-fixtures.test.mjs"
+    ]
+  },
+  "architecture": {
+    "kernel": "docs/runtime-boundary.md",
+    "domainAdapter": "src/domain.mjs",
+    "capabilityAdapter": "src/capabilities.mjs",
+    "interface": "cordis.patch.yml",
+    "state": "src/workflow.mjs",
+    "facts": "agent_project.json"
+  },
+  "risk": {
+    "dangerousWrites": __PROJECT_DANGEROUS_WRITES_JSON__,
+    "approvalRequired": true,
+    "denialSupported": true
+  },
+  "commands": {
+    "test": ["{python}", "tools/test_project.py"],
+    "acceptance": ["{python}", "tools/acceptance.py", "--output", "evidence/acceptance.json"],
+    "package": ["{python}", "tools/package_handoff.py", "--output-dir", "dist"]
+  },
+  "evidence": {
+    "acceptance": "evidence/acceptance.json",
+    "handoff": "evidence/handoff.json"
+  },
+  "requiredFiles": [
+    "README.md",
+    "AGENTS.md",
+    "agent_project.json",
+    "builder-provenance.json",
+    "package.json",
+    "cordis.patch.yml",
+    "docs/runtime-boundary.md",
+    "index.mjs",
+    "src/project.mjs",
+    "src/domain.mjs",
+    "src/capabilities.mjs",
+    "src/workflow.mjs",
+    "src/plugin.mjs",
+    "tests/domain.test.mjs",
+    "tests/domain-fixtures.test.mjs",
+    "tests/workflow.test.mjs",
+    "tests/plugin.test.mjs",
+    "tools/test_project.py",
+    "tools/acceptance.py",
+    "tools/dsh_runtime.py",
+    "tools/run_dsh.py",
+    "tools/dsh_bootstrap.mjs",
+    "tools/offline_acceptance.mjs",
+    "tools/package_handoff.py",
+    "fixtures/domain-cases.json"
+  ],
+  "rollback": "Stop the external DSH process. If .runtime or work exists, atomically rename each to a timestamped backup on the same volume, record its hash inventory, and restore the previous verified handoff into a separate path. Switch paths only after acceptance passes, and keep every backup until the owner explicitly confirms that credentials and business data are no longer needed; external DSH is never modified."
+}

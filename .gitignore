@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+node_modules/
+.DS_Store
+Thumbs.db
+evals/dsh-doctor-report.json
+evals/reproduction-focused-report.json
+evals/reproduction-workbench-report.json

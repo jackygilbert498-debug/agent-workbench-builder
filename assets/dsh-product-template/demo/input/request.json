@@ -1,0 +1,5 @@
+{
+  "task_id": "demo-001",
+  "scenario_id": __PROJECT_PRIMARY_SCENARIO_ID_JSON__,
+  "content": __PROJECT_DEMO_CONTENT_JSON__
+}

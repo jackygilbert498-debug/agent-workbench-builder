@@ -1,0 +1,70 @@
+{
+  "schema": "agent-workbench-blueprint/v1",
+  "productKind": "workbench",
+  "project": {
+    "slug": "local-operations-workbench",
+    "title": "本地事务工作台",
+    "purpose": "统一处理本地请求分诊、收件箱概览和任务状态核对",
+    "primaryUsers": [
+      "个人项目负责人"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "request-triage",
+      "title": "请求分诊",
+      "responsibility": "分析本地请求并生成待确认的分类计划",
+      "risk": "approval-required"
+    },
+    {
+      "id": "inbox-overview",
+      "title": "收件箱概览",
+      "responsibility": "只读汇总待处理请求和优先级分布",
+      "risk": "read-only"
+    },
+    {
+      "id": "task-audit",
+      "title": "任务状态核对",
+      "responsibility": "只读核对已有任务的状态和证据",
+      "risk": "read-only"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "triage-request",
+      "title": "分诊一条新请求",
+      "primary": true,
+      "trigger": "收件箱出现新的本地请求",
+      "input": "请求标识和请求正文",
+      "observableOutput": "经人工批准后生成的分类任务文件",
+      "capabilityIds": [
+        "request-triage"
+      ]
+    },
+    {
+      "id": "review-inbox",
+      "title": "查看待处理请求概览",
+      "primary": false,
+      "trigger": "使用者准备安排当天工作",
+      "input": "当前收件箱请求集合",
+      "observableOutput": "只读数量、优先级和待处理摘要",
+      "capabilityIds": [
+        "inbox-overview"
+      ]
+    },
+    {
+      "id": "audit-task",
+      "title": "核对一项任务状态",
+      "primary": false,
+      "trigger": "使用者需要确认任务是否真实完成",
+      "input": "任务标识、输出和完成凭证",
+      "observableOutput": "只读状态、证据和缺口清单",
+      "capabilityIds": [
+        "task-audit"
+      ]
+    }
+  ],
+  "dangerousWrites": [
+    "在项目输出目录创建经批准的任务文件"
+  ]
+}

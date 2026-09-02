@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent 工作台构建器"
+  short_description: "从 starter 到领域化 Agent，并以外部 DSH 完成交付"
+  default_prompt: "Use $agent-workbench-builder. Recommend focused-agent for a beginner unless the evidence justifies a workbench, keep a fresh scaffold at PARTIAL, help me implement domain-specific behavior and fixtures, verify the live external DSH Profile and clean-room handoff, and report human and external evidence separately."
+policy:
+  allow_implicit_invocation: true

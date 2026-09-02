@@ -1,0 +1,8 @@
+# Product-only Bundle layer. DeepSeek Harness remains an external dependency.
+- id: system-prompt
+  config:
+    persona: __PROJECT_TITLE_JSON__
+
+- insert:
+    - id: __PROJECT_SLUG_TEXT__-product-tools
+      name: '@agent-workbench/__PROJECT_SLUG_TEXT__'

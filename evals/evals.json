@@ -1,0 +1,44 @@
+{
+  "skill_name": "agent-workbench-builder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我是 AI 辅助编程新手，想做一个只在本地整理报销凭证的 Agent：读入一条报销说明，判断缺少哪些材料，经我批准后生成待补材料清单。请基于外部 DSH 帮我从零做到可交接。",
+      "expected_output": "选择 focused-agent，fresh scaffold 明确为 PARTIAL；实现报销领域适配器、正向和拒绝夹具；完成审批、三次幂等、DSH Profile/Web/受控停止、交接解压复验，并把真人盲测标为 NOT-RUN。",
+      "files": [],
+      "expectations": [
+        "默认推荐 focused-agent，并记录选择依据",
+        "不把 fresh scaffold 或 starter fixture 通过称为项目毕业",
+        "领域夹具覆盖主要场景、能力和至少一个边界案例",
+        "毕业报告的 domain-adaptation 与全部工程硬门通过",
+        "DSH 保持 external 且 bundled=false",
+        "HUMAN-BLIND-TEST 在无人执行时为 NOT-RUN"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我要做一个个人内容运营工作台，包含选题收集、素材盘点、发布前核对三项能力。不同能力有不同输出，只有发布清单写入需要审批。请用 DSH 做成可以换机复现的项目。",
+      "expected_output": "选择 workbench，冻结统一目的、三项能力和至少三条代表场景；每项能力有不同领域结果；真实 DSH 和交接复验通过。",
+      "files": [],
+      "expectations": [
+        "workbench 至少有三条代表场景并覆盖三项能力",
+        "每项能力有不同的领域输出和对应 fixture expectation",
+        "只为危险写能力注册审批门",
+        "Windows 中文或空格路径使用有摘要的安全暂存",
+        "交接包不包含 DSH、运行状态、缓存或秘密"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "同事给了我一个陌生 Agent 仓库，说测试都过了。先不要运行里面任何脚本，请判断它是否真的达到与你的小蛇项目可比的工程完成度，并列出最小补齐计划。",
+      "expected_output": "把任务路由为不可信项目评审，只做人工/静态检查并使用 evaluate --no-run；状态最多 PARTIAL，不执行仓库声明命令。",
+      "files": [],
+      "expectations": [
+        "不执行不可信仓库中的命令",
+        "使用 no-run 并明确最多 PARTIAL",
+        "逐项报告领域适配、审批、幂等、DSH、交接和证据缺口",
+        "不把配置存在或测试数量当成完成度"
+      ]
+    }
+  ]
+}

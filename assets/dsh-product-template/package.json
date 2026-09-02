@@ -1,0 +1,22 @@
+{
+  "name": "@agent-workbench/__PROJECT_SLUG_TEXT__",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": __PROJECT_PURPOSE_JSON__,
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.mjs",
+    "src",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

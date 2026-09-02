@@ -1,0 +1,70 @@
+{
+  "schema": "agent-workbench-project/v4",
+  "project": {
+    "slug": __PROJECT_SLUG_JSON__,
+    "title": __PROJECT_TITLE_JSON__,
+    "kind": "focused-agent",
+    "originalityStatement": "This project owns its product purpose, domain rules, evidence, and outputs; it does not copy Xiaoshe branding or workflows."
+  },
+  "product": {
+    "purpose": __PROJECT_PURPOSE_JSON__,
+    "primaryUsers": __PROJECT_PRIMARY_USERS_JSON__
+  },
+  "capabilities": __PROJECT_CAPABILITIES_JSON__,
+  "acceptanceScenarios": __PROJECT_SCENARIOS_JSON__,
+  "runtime": {
+    "kind": "standalone",
+    "bundled": false
+  },
+  "development": {
+    "stage": "starter",
+    "domainEvidence": {
+      "fixtures": "fixtures/domain-cases.json",
+      "report": "evidence/domain-adaptation.json",
+      "test": "tests/test_workbench.py"
+    },
+    "criticalFiles": [
+      "agent_workbench/domain.py",
+      "fixtures/domain-cases.json",
+      "tests/test_workbench.py"
+    ]
+  },
+  "architecture": {
+    "kernel": "agent_workbench/core.py",
+    "domainAdapter": "agent_workbench/domain.py",
+    "interface": "agent_workbench/server.py",
+    "state": "agent_workbench/store.py",
+    "facts": "agent_project.json"
+  },
+  "risk": {
+    "dangerousWrites": __PROJECT_DANGEROUS_WRITES_JSON__,
+    "approvalRequired": true,
+    "denialSupported": true
+  },
+  "commands": {
+    "test": ["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"],
+    "acceptance": ["{python}", "tools/acceptance.py", "--output", "evidence/acceptance.json"],
+    "package": ["{python}", "tools/package_handoff.py", "--output-dir", "dist"]
+  },
+  "evidence": {
+    "acceptance": "evidence/acceptance.json",
+    "handoff": "evidence/handoff.json"
+  },
+  "requiredFiles": [
+    "README.md",
+    "agent_project.json",
+    "builder-provenance.json",
+    "agent_workbench/__init__.py",
+    "agent_workbench/cli.py",
+    "agent_workbench/core.py",
+    "agent_workbench/domain.py",
+    "agent_workbench/server.py",
+    "agent_workbench/store.py",
+    "demo/input/request.json",
+    "fixtures/domain-cases.json",
+    "tests/test_workbench.py",
+    "tools/acceptance.py",
+    "tools/package_handoff.py"
+  ],
+  "rollback": "Stop the local process. Atomically rename the current project directory to a timestamped backup on the same volume, record its hash inventory, and restore the previous verified handoff into a separate path. Switch paths only after acceptance passes, and keep the backup until the owner explicitly confirms that business data are no longer needed; this project installs no service and changes no system configuration."
+}

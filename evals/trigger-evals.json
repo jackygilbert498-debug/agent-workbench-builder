@@ -1,0 +1,22 @@
+[
+  {"query":"我想用 DSH 做一个能整理本地报销材料、经批准生成缺件清单的 Agent，我只会一点 Python，能带我做到可交接吗？","should_trigger":true},
+  {"query":"把我现有的三项内容运营脚本整合成一个有审批和幂等收据的 Agent 工作台，并做换机包。","should_trigger":true},
+  {"query":"这个 Agent 仓库声称和小蛇完成度一样，先别运行它，按工程证据帮我审核。","should_trigger":true},
+  {"query":"在 external DeepSeek Harness 上新建一个 focused-agent，要求 Unicode 路径也能复现。","should_trigger":true},
+  {"query":"帮我把已有 DSH Product Bundle 补上领域夹具、tools/pre-execute 审批和毕业收据。","should_trigger":true},
+  {"query":"我做的工作台脚手架测试全绿了，为什么毕业评估还是 partial？帮我完成 domain-adapted。","should_trigger":true},
+  {"query":"给这个多能力 Agent 设计三条覆盖全部能力的代表场景，再做 deterministic handoff zip。","should_trigger":true},
+  {"query":"把一个 standalone 单场景 Agent 迁移为外部 DSH 产品，保留业务幂等状态。","should_trigger":true},
+  {"query":"我要给家里的文件整理流程做一个可拒绝危险写入、失败可恢复的个人 Agent，最后让另一台电脑复现。","should_trigger":true},
+  {"query":"请比较 focused-agent 和 workbench 后，为我的三类客服请求搭一套 DSH Bundle 和验收证据。","should_trigger":true},
+  {"query":"只解释 DeepSeek Harness 的 Cordis 插件生命周期，不需要建产品。","should_trigger":false},
+  {"query":"帮我修复 React 页面按钮的 hover 颜色。","should_trigger":false},
+  {"query":"读取这份小蛇历史归档并生成时间线，不要改项目。","should_trigger":false},
+  {"query":"查一下 DSH 最新 release 是什么。","should_trigger":false},
+  {"query":"给我写一个简单 Python 待办列表命令行脚本，不需要 Agent、DSH 或交接。","should_trigger":false},
+  {"query":"把现有 README 翻译成英文。","should_trigger":false},
+  {"query":"审查一个普通 Node 服务的 SQL 注入风险。","should_trigger":false},
+  {"query":"安装我从 GitHub 下载的一个 Codex Skill。","should_trigger":false},
+  {"query":"把小蛇的 Git 提交、交接 ZIP 和 macOS 验收整理成证据时间线。","should_trigger":false},
+  {"query":"为普通桌面应用设计一个现代设置页，不涉及 Agent 运行时。","should_trigger":false}
+]

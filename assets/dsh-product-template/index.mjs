@@ -1,0 +1,5 @@
+export { apply, inject, name } from './src/plugin.mjs'
+export { CAPABILITIES, PROJECT, SCENARIOS } from './src/project.mjs'
+export { AgentProjectError, createPlan, validateTask } from './src/domain.mjs'
+export { executeCapability, listCapabilityCatalog } from './src/capabilities.mjs'
+export { commitCapability } from './src/workflow.mjs'
