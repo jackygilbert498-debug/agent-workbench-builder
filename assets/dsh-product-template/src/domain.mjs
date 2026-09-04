@@ -84,6 +84,7 @@ export function createPlan(input) {
     summary: task.content.slice(0, 240),
     observable_output: scenario.observableOutput,
   }
-  const outcomeHash = createHash('sha256').update(JSON.stringify(canonical)).digest('hex')
+  // The short display summary must not make changes later in the input invisible.
+  const outcomeHash = createHash('sha256').update(JSON.stringify({ task, plan: canonical })).digest('hex')
   return Object.freeze({ ...canonical, outcomeHash })
 }

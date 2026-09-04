@@ -69,9 +69,24 @@ PORTABLE_PATH_EXAMPLES = {
         "/usr/local/opt/node@24/bin/node",
     ),
 }
-BUILDER_VERSION = "4.0.1"
-BUILDER_RELEASE_TAG = "v4.0.1"
+BUILDER_VERSION = "4.0.2"
+BUILDER_RELEASE_TAG = "v4.0.2"
 BUILDER_PUBLIC_URL = "https://github.com/jackygilbert498-debug/agent-workbench-builder"
+
+
+class PackagePathError(RuntimeError):
+    """The final artifact path exceeds the supported Windows filename boundary."""
+
+    code = "PACKAGE_PATH_TOO_LONG"
+
+
+def _check_output_path(path: Path) -> None:
+    """Reject an unsupported destination before creating a partial handoff."""
+    if os.name == "nt" and len(str(path).encode("utf-16-le")) // 2 >= 260:
+        raise PackagePathError(
+            "PACKAGE_PATH_TOO_LONG: use a shorter project directory or project name "
+            "and retry; the final Windows artifact path must be under 260 UTF-16 units."
+        )
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -280,7 +295,9 @@ def _atomic_text(path: Path, value: str) -> None:
     _assert_no_link_components(staging_dir.parent)
     staging_dir.mkdir(parents=True, exist_ok=True)
     _assert_no_link_components(staging_dir)
-    descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=staging_dir)
+    # Keep staging short; repeating a hash-addressed archive name exceeds Windows
+    # path limits even when the final sidecar destination itself is supported.
+    descriptor, temporary_name = tempfile.mkstemp(prefix=".awb-", dir=staging_dir)
     temporary = Path(temporary_name)
     try:
         with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
@@ -326,6 +343,7 @@ def build_package(output_dir: Path) -> dict[str, Any]:
         raise RuntimeError("output directory must stay inside the project") from exc
     if output_dir == PROJECT_ROOT or output_dir.parent != PROJECT_ROOT.resolve():
         raise RuntimeError("output directory must be one dedicated top-level project subdirectory")
+    _check_output_path(output_dir / f"{slug}-handoff-{'0' * 64}.zip.sha256")
     if output_dir.exists():
         is_junction = getattr(os.path, "isjunction", None)
         unexpected = [
@@ -493,7 +511,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         receipt = {
             "schema": "agent-workbench-handoff/v4",
             "status": "FAIL",
-            "error": {"code": "PACKAGE_FAILED", "message": message},
+            "error": {"code": getattr(exc, "code", "PACKAGE_FAILED"), "message": message},
         }
         _atomic_json(PROJECT_ROOT / "evidence/handoff.json", receipt)
         print(json.dumps(receipt, ensure_ascii=False, indent=2 if args.pretty else None))

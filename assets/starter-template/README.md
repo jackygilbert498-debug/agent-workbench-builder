@@ -24,6 +24,8 @@ python tools/package_handoff.py --output-dir dist
 
 macOS / Linux 若没有 `python` 命令，把上面的 `python` 改为 `python3`。
 
+Windows 下项目目录尽量短。若打包报 `PACKAGE_PATH_TOO_LONG`，按本页恢复说明保留旧项目与数据，选择更短的新位置后复验；不要用覆盖旧目录或关闭检查来绕过。
+
 运行一次批准路径：
 
 ```text
@@ -55,4 +57,4 @@ python -m agent_workbench.server --host 127.0.0.1 --port 8765
 
 ## 毕业
 
-模板生成不是毕业。Builder 不在交接 ZIP 内；接收方可运行 `git clone --branch v4.0.1 --depth 1 https://github.com/jackygilbert498-debug/agent-workbench-builder.git builder-verification`，进入 `builder-verification` 后使用版本 `4.0.1` 的 `scripts/evaluate_project.py`。以 `evidence/graduation.json` 的 `PASS`、七个硬门、20 分维度和交接 ZIP 哈希为准。自动 PASS 仍不等于独立真人盲测或真实供应商验收。
+模板生成不是毕业。Builder 不在交接 ZIP 内；接收方可运行 `git clone --branch v4.0.2 --depth 1 https://github.com/jackygilbert498-debug/agent-workbench-builder.git builder-verification`，进入 `builder-verification` 后使用版本 `4.0.2` 的 `scripts/evaluate_project.py`。以 `evidence/graduation.json` 的 `PASS`、七个硬门、20 分维度和交接 ZIP 哈希为准。自动 PASS 仍不等于独立真人盲测或真实供应商验收。

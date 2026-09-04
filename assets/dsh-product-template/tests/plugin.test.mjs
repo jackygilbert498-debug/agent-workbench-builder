@@ -65,6 +65,60 @@ test('every DSH plan tool executes its declared capability adapter', async () =>
   }
 })
 
+test('a product write preserves a downstream denial and its reason', async () => {
+  const { listeners } = fixture()
+  const capability = CAPABILITIES.find(item => item.risk === 'approval-required')
+  const denial = { kind: 'deny', reason: 'The deployment disabled business writes.' }
+  const decision = await listeners[0](
+    { name: toolNamesForCapability(capability).commit },
+    async () => denial,
+  )
+  assert.deepEqual(decision, denial)
+})
+
+test('a product write preserves a downstream approval requirement', async () => {
+  const { listeners } = fixture()
+  const capability = CAPABILITIES.find(item => item.risk === 'approval-required')
+  const approval = { kind: 'ask', reason: 'Review the restricted destination first.' }
+  assert.deepEqual(await listeners[0](
+    { name: toolNamesForCapability(capability).commit }, async () => approval,
+  ), approval)
+})
+
+test('native catalog content exposes selectable capability and scenario identifiers', async () => {
+  const { definitions } = fixture()
+  const catalog = definitions.get(`${PROJECT.slug.replaceAll('-', '_')}_catalog`)
+  const catalogValue = await catalog.execute({})
+  const catalogText = catalog.output.render({}, catalogValue).map(item => item.text).join('\n')
+  assert.match(catalogText, /"scenarios"/u)
+  assert.equal(JSON.parse(catalogText).scenarios[0].id, SCENARIOS[0].id)
+})
+
+test('native plan content exposes actual business fields before saving', async () => {
+  const { definitions } = fixture()
+  for (const capability of CAPABILITIES) {
+    const scenario = SCENARIOS.find(item => item.capabilityIds.includes(capability.id))
+    const args = { task_id: `preview-${capability.id}`, scenario_id: scenario.id, content: 'Login shows 403; needed today.' }
+    const tool = definitions.get(toolNamesForCapability(capability).plan)
+    const value = await tool.execute(args)
+    const text = tool.output.render(args, value).map(item => item.text).join('\n')
+    assert.match(text, /Login shows 403; needed today\./u)
+    const preview = JSON.parse(text)
+    assert.equal(preview.summary, 'Login shows 403; needed today.')
+    assert.deepEqual(preview, value)
+    assert.equal(preview.sideEffectWritten, false)
+  }
+})
+
+test('oversized native previews fail visibly instead of hiding part of the draft', () => {
+  const { definitions } = fixture()
+  const tool = definitions.get(toolNamesForCapability(CAPABILITIES[0]).plan)
+  assert.throws(
+    () => tool.output.render({}, { summary: '界'.repeat(24_000) }),
+    error => error.code === 'TOOL_OUTPUT_TOO_LARGE',
+  )
+})
+
 test('a commit launched from another cwd writes only under an injected isolated Product work root', async () => {
   const capability = CAPABILITIES.find(item => item.risk === 'approval-required')
   const scenario = SCENARIOS.find(item => item.capabilityIds.includes(capability.id))

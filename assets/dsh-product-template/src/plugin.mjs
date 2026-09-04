@@ -4,6 +4,7 @@ import { dirname, isAbsolute, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { CAPABILITIES, PROJECT } from './project.mjs'
+import { AgentProjectError } from './domain.mjs'
 import { capabilityToolToken, executeCapability, listCapabilityCatalog } from './capabilities.mjs'
 import { commitCapability } from './workflow.mjs'
 
@@ -56,6 +57,20 @@ const RESULT_SCHEMA = {
   required: ['schema', 'status', 'taskId', 'scenarioId', 'capabilityId', 'sideEffectWritten', 'outcomeHash'],
 }
 
+function renderToolValue(_args, value) {
+  // Native tool conversations consume rendered content, not the structured value.
+  // Fail visibly when too large: a truncated draft is not a safe approval preview.
+  const text = JSON.stringify(value, null, 2)
+  if (Buffer.byteLength(text, 'utf8') > 64 * 1024) {
+    throw new AgentProjectError(
+      'TOOL_OUTPUT_TOO_LARGE',
+      'The tool result exceeds the 64 KiB preview limit.',
+      'Reduce the result or split the task; preview the complete draft before approving.',
+    )
+  }
+  return [{ type: 'text', text }]
+}
+
 function productToken() {
   return PROJECT.slug.replaceAll('-', '_')
 }
@@ -87,7 +102,7 @@ export function applyWithWorkRoot(ctx, workRoot) {
         },
         required: ['schema', 'productKind', 'purpose', 'capabilities', 'scenarios'],
       },
-      render: (_args, value) => [{ type: 'text', text: `${value.capabilities.length} capabilities · ${value.scenarios.length} representative scenarios` }],
+      render: renderToolValue,
     },
     execute: async () => listCapabilityCatalog(),
     presentCall: () => ({ card: 'generic', title: `${PROJECT.title} capability catalog`, kind: 'search', rawInput: {} }),
@@ -102,7 +117,7 @@ export function applyWithWorkRoot(ctx, workRoot) {
       parameters: TASK_SCHEMA,
       output: {
         schema: RESULT_SCHEMA,
-        render: (_args, value) => [{ type: 'text', text: `Plan ready: ${value.capabilityId}/${value.scenarioId}.` }],
+        render: renderToolValue,
       },
       execute: async args => executeCapability(capability.id, args),
       presentCall: args => ({ card: 'generic', title: `Plan · ${capability.title}`, kind: 'search', rawInput: args }),
@@ -129,8 +144,11 @@ export function applyWithWorkRoot(ctx, workRoot) {
 
   ctx.on('tools/pre-execute', async (execution, next) => {
     const reason = writeReasons.get(execution.name)
-    if (reason !== undefined) return { kind: 'ask', reason }
-    return next()
+    if (reason === undefined) return next()
+    // A local approval requirement must never hide a later policy rejection.
+    const decision = await next()
+    if (decision?.kind === 'deny' || decision?.kind === 'ask') return decision
+    return { kind: 'ask', reason }
   })
 }
 

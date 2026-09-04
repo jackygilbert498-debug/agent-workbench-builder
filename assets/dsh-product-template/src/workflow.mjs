@@ -176,27 +176,45 @@ async function reserveIdempotencyKey(workRoot, ledgerKey) {
   const deadline = Date.now() + LOCK_TIMEOUT_MS
   while (true) {
     await assertNoLinkComponents(lockPath)
+    let handle
     try {
-      const handle = await open(lockPath, 'wx', 0o600)
-      try {
-        await handle.writeFile(canonicalBytes({ pid: process.pid, token }))
-      } finally {
-        await handle.close()
-      }
-      return async () => {
+      handle = await open(lockPath, 'wx', 0o600)
+    } catch (error) {
+      const code = error && typeof error === 'object' ? error.code : undefined
+      // Windows can report EPERM while another process releases a lock. Retry
+      // only exclusive-open failures, never owner-record writes or close errors.
+      // Inspection does not grant ownership: each retry must still acquire wx.
+      let transientSharingError = false
+      if (process.platform === 'win32' && code === 'EPERM') {
         try {
-          const owner = JSON.parse(await readFile(lockPath, 'utf8'))
-          if (owner.token === token) await unlink(lockPath)
-        } catch (error) {
-          if (!(error && typeof error === 'object' && error.code === 'ENOENT')) throw error
+          const info = await lstat(lockPath)
+          transientSharingError = info.isFile() && !info.isSymbolicLink()
+        } catch (inspectionError) {
+          transientSharingError = inspectionError?.code === 'ENOENT'
         }
       }
-    } catch (error) {
-      if (!(error && typeof error === 'object' && error.code === 'EEXIST')) throw error
+      if (code !== 'EEXIST' && !transientSharingError) throw error
       if (Date.now() >= deadline) {
+        if (transientSharingError) {
+          throw new AgentProjectError('LOCK_UNAVAILABLE', 'the local task lock remained unavailable', 'Wait for other workers to finish and check directory permissions. Inspect crash locks before removing anything; no business write was authorized by this failure.')
+        }
         throw new AgentProjectError('IDEMPOTENCY_BUSY', 'another worker still owns this idempotency key', 'Wait for that worker to finish. If its process crashed, inspect and remove only this stale lock before retrying.')
       }
       await delay(LOCK_POLL_MS)
+      continue
+    }
+    try {
+      await handle.writeFile(canonicalBytes({ pid: process.pid, token }))
+    } finally {
+      await handle.close()
+    }
+    return async () => {
+      try {
+        const owner = JSON.parse(await readFile(lockPath, 'utf8'))
+        if (owner.token === token) await unlink(lockPath)
+      } catch (error) {
+        if (!(error && typeof error === 'object' && error.code === 'ENOENT')) throw error
+      }
     }
   }
 }

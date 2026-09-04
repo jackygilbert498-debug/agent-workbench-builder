@@ -38,8 +38,8 @@
 1. 用户明确产品形态；`workbench` 先完成并校验蓝图。
 2. doctor 通过后生成 Product Bundle；目标目录必须不存在。
 3. 先运行一次评估，确认 fresh starter 为 `PARTIAL`；逐项替换领域适配器、夹具和领域测试，最后才把 stage 改为 `domain-adapted`。
-4. 为危险 commit 工具增加 DSH `tools/pre-execute → ask`；真实运行拒绝路径。
-5. 加入原子写、幂等键、既有产物校验、稳定错误码和恢复提示。
+4. 为危险 commit 工具接入 DSH `tools/pre-execute`：先执行 next 并保留后续 deny/ask，再补产品审批；真实运行拒绝路径。原生 plan 结果须展示真实草稿，不只返回状态。
+5. 加入原子写、幂等键、完整输入识别、既有产物校验、稳定错误码和恢复提示；同编号只改长文本尾部也要检查冲突。
 6. 用隔离 `DSH_HOME` 安装本地 Bundle，运行最终 Profile dump。
 7. 启动 DSH Web，验证 loopback HTTP 和 stdin 哨兵触发的干净停止；fallback terminate/kill 不能记为 clean。
 8. 生成验收收据、确定性交接 ZIP、manifest、逐文件/归档 SHA-256 和回退说明。

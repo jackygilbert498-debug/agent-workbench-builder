@@ -267,8 +267,8 @@ class ScaffoldTests(unittest.TestCase):
                 "fixtures/domain-cases.json",
             )
             self.assertEqual(provenance["schema"], "agent-workbench-builder-provenance/v3")
-            self.assertEqual(provenance["builderVersion"], "4.0.1")
-            self.assertEqual(provenance["builderReleaseTag"], "v4.0.1")
+            self.assertEqual(provenance["builderVersion"], "4.0.2")
+            self.assertEqual(provenance["builderReleaseTag"], "v4.0.2")
             self.assertFalse(provenance["builderBundled"])
             self.assertEqual(
                 provenance["builderPublicUrl"],

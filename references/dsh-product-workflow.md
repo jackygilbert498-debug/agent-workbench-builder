@@ -56,13 +56,25 @@ pnpm run build
 
 ## 审批与写入
 
-危险工具在 `tools/pre-execute` 监听器中返回：
+危险工具不能直接返回 `ask` 而跳过其他规则。模板先调用 `next()`，保留后续拒绝或审批要求，再补上自己的审批要求：
 
 ```js
-{ kind: 'ask', reason: '明确描述将发生的业务写入' }
+ctx.on('tools/pre-execute', async (execution, next) => {
+  const reason = writeReasons.get(execution.name)
+  if (reason === undefined) return next()
+  const decision = await next()
+  if (decision?.kind === 'deny' || decision?.kind === 'ask') return decision
+  return { kind: 'ask', reason }
+})
 ```
 
 DSH 将其交给一次性 approval seam；审批通道缺失、取消或拒绝都关闭式失败。工具实现收到执行权后仍只写工作区内的声明目录，并使用原子写、稳定幂等键和冲突拒绝。不要让模型提供任意输出路径或 shell 字符串。只读能力不能伪装成需要审批的写工具，危险能力也不能因位于 workbench 中而绕过审批。
+
+上例的 `writeReasons` 是模板 `src/plugin.mjs` 中由声明的 commit 工具构成的映射。部署级的 DSH guard 仍须保留；不能用产品审批取代它。
+
+原生工具调用的后续模型上下文读取 `output.render` 产生的内容，不只读取结构化 `value`。目录应给出能力/场景编号，plan 应给出实际业务预览。模板完整序列化结果，超过 64 KiB 明确失败，不悄悄截断。领域适配后核对预览字段和真正写入的结果一致。
+
+幂等识别包含完整规范化输入，不以 240 字符的显示摘要代替原文。测试既要覆盖重复输入，也要覆盖长文本末尾改变但任务编号不变的冲突；拒绝不生成业务产物，但允许留下脱敏拒绝收据。
 
 ## 隔离验收
 

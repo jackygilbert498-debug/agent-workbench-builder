@@ -66,6 +66,45 @@ def write_fixture(root: Path, *, slug: str = "fixture") -> None:
 
 
 class HandoffSafetyTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Windows output-path compatibility check")
+    def test_packagers_explain_unsupported_final_path_before_creating_archive(self) -> None:
+        """An overlong final artifact path gets a useful error, not a partial ZIP."""
+        for template, name in (
+            ("starter-template", "standalone_packager_path_preflight"),
+            ("dsh-product-template", "dsh_packager_path_preflight"),
+        ):
+            module = load_packager(template, name)
+            with tempfile.TemporaryDirectory() as raw:
+                parent = Path(raw)
+                root = parent / ("p" * max(1, 180 - len(str(parent))))
+                write_fixture(root, slug="customer-notes")
+                with patch.object(module, "PROJECT_ROOT", root):
+                    with self.assertRaisesRegex(Exception, "PACKAGE_PATH_TOO_LONG.*shorter project directory"):
+                        module.build_package(Path("dist"))
+                self.assertFalse((root / "dist").exists())
+
+    def test_atomic_sidecar_handles_a_deep_project_and_long_archive_name(self) -> None:
+        """A supported destination must not fail because staging repeats its name."""
+        for template, name in (
+            ("starter-template", "standalone_packager_deep_path"),
+            ("dsh-product-template", "dsh_packager_deep_path"),
+        ):
+            module = load_packager(template, name)
+            with tempfile.TemporaryDirectory() as raw:
+                parent = Path(raw)
+                # Keep the final destination below the legacy Windows path limit,
+                # but make the old staging prefix exceed it.
+                root = parent / ("p" * max(1, 138 - len(str(parent))))
+                write_fixture(root)
+                target = root / "dist" / ("customer-notes-handoff-" + "a" * 64 + ".zip.sha256")
+                with patch.object(module, "PROJECT_ROOT", root):
+                    try:
+                        module._atomic_text(target, "verified sidecar\n")
+                    except OSError as exc:
+                        self.fail(f"Supported sidecar destination failed during staging: {exc}")
+                self.assertEqual(target.read_text(encoding="utf-8"), "verified sidecar\n")
+                self.assertEqual(list((root / ".runtime/atomic-writes").iterdir()), [])
+
     def test_standalone_packager_does_not_import_mutable_business_modules(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -282,7 +321,7 @@ class HandoffSafetyTests(unittest.TestCase):
                 with zipfile.ZipFile(archive) as bundle:
                     self.assertFalse(any(name.startswith("handoff/") for name in bundle.namelist()))
                     manifest = json.loads(bundle.read("_handoff/manifest.json"))
-                self.assertEqual(manifest["verificationDependencies"][0]["version"], "4.0.1")
+                self.assertEqual(manifest["verificationDependencies"][0]["version"], "4.0.2")
                 self.assertFalse(manifest["verificationDependencies"][0]["bundled"])
 
     def test_source_race_does_not_replace_previous_good_archive_or_sidecar(self) -> None:

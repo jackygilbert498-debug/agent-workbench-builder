@@ -16,8 +16,8 @@ import tempfile
 from typing import Any, Iterable
 
 
-BUILDER_VERSION = "4.0.1"
-BUILDER_RELEASE_TAG = "v4.0.1"
+BUILDER_VERSION = "4.0.2"
+BUILDER_RELEASE_TAG = "v4.0.2"
 BUILDER_PUBLIC_URL = "https://github.com/jackygilbert498-debug/agent-workbench-builder"
 BLUEPRINT_SCHEMA = "agent-workbench-blueprint/v1"
 PRODUCT_KINDS = {"focused-agent", "workbench"}

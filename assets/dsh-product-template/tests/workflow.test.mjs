@@ -129,6 +129,19 @@ test('three approved runs produce one side effect and one result hash', () => wi
   assert.equal(new Set(results.map(item => item.outcomeHash)).size, 1)
 }))
 
+test('changed input after the displayed summary is a conflict, not a replay', () => withRoot(async root => {
+  const first = { ...task('long-input-001'), content: 'Ordinary detail. '.repeat(20) + 'attachment A' }
+  const saved = await commitCapability(WRITE_CAPABILITY.id, first, {
+    approved: true, runId: 'long-first', workRoot: root,
+  })
+  const before = await readFile(join(root, saved.output))
+  await assert.rejects(commitCapability(WRITE_CAPABILITY.id, {
+    ...first, content: 'Ordinary detail. '.repeat(20) + 'attachment B',
+  }, { approved: true, runId: 'long-changed', workRoot: root }),
+  error => error instanceof AgentProjectError && error.code === 'IDEMPOTENCY_CONFLICT')
+  assert.deepEqual(await readFile(join(root, saved.output)), before)
+}))
+
 test('concurrent approved runs reserve one idempotency key atomically', () => withRoot(async root => {
   const results = await Promise.all([
     commitCapability(

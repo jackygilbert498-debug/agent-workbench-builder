@@ -22,7 +22,7 @@ EXPECTED_TEST_MODULES = frozenset(
         "test_scaffold_project.py",
     }
 )
-EXPECTED_TEST_COUNT = 82
+EXPECTED_TEST_COUNT = 84
 
 
 class SuiteContractError(RuntimeError):

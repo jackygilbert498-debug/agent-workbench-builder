@@ -1,6 +1,6 @@
 ---
 name: agent-workbench-builder
-description: Use when Codex must turn a real work or life scenario into a reproducible focused Agent or multi-capability Agent workbench on an external DeepSeek Harness, or must upgrade/review such a project for domain fit, approval safety, idempotency, representative evidence, clean-room handoff, and comparable engineering completion.
+description: Use when a coding AI is asked to build, adapt, or review a focused Agent or multi-capability workbench for a real work or life scenario on external DeepSeek Harness, including domain fit, approval safety, idempotency, and reproducible handoff.
 ---
 
 # Agent 工作台构建器
@@ -40,7 +40,7 @@ description: Use when Codex must turn a real work or life scenario into a reprod
 
 DSH 是外部依赖，Builder 不下载、不复制、不打包 DSH。当前经 XS/Builder 实测的兼容边界是 DSH `0.1.0-rc.8`、pnpm `11.7.0`、Node `22.x（>=22.19.0）` 或 `>=24`。它不是 DSH 当前最新版本。
 
-让使用者从官方仓库固定标签安装。首次依赖安装和构建可能需要数分钟并占用数 GB 空间；所有 pnpm 命令都必须在 DSH 根目录执行。Windows PowerShell：
+让使用者从官方仓库固定标签安装。首次依赖安装和构建可能需要数分钟并占用数 GB 空间；DSH 的依赖安装和构建命令必须在 DSH 根目录执行。Windows PowerShell：
 
 ```powershell
 git clone --branch dsh-v0.1.0-rc.8 --depth 1 https://github.com/deepseek-ai/deepseek-harness.git C:\path\to\deepseek-harness
@@ -94,6 +94,10 @@ python scripts/scaffold_project.py --product-kind workbench --blueprint "/path/t
 
 脚手架结果只是 `starter`。即使模板测试、DSH 和交接命令都成功，毕业评估也必须返回 `PARTIAL`；若 fresh scaffold 得到项目 `PASS`，立即停止并报告评估器缺陷。
 
+Windows 项目目录尽量靠近磁盘根目录，不要套很多层。打包若报 `PACKAGE_PATH_TOO_LONG`，选择更短的新项目路径并按回退说明迁移、复验；不要关闭安全检查或覆盖已有目录。
+
+在 Builder 或新项目目录再运行 `pnpm --version`，也必须为 `11.7.0`。DSH 的 `packageManager` 可能让其目录里的版本正确，却掩盖当前 PATH 上另一个默认版本。用 `Get-Command pnpm`（Windows）或 `command -v pnpm` 找到命令来源；让当前终端 PATH 指向正确版本，再从同一终端重跑 doctor 与评估。评估器有意过滤额外环境变量，仅设置 `AGENT_WORKBENCH_PNPM` 不能替代正确 PATH；不要放宽环境白名单或贸然改全局配置。
+
 ## 从 starter 到 domain-adapted
 
 不要只改名称或提示词。完成下面四项：
@@ -146,13 +150,18 @@ Windows 下 Builder 会把 Product Bundle 精确暂存到 ASCII 无空格目录�
 ## 必须保留的安全属性
 
 - DSH `bundled=false`；项目、证据和 ZIP 均不得含 DSH checkout。
-- 危险工具在 `tools/pre-execute` 返回 `ask`；没有审批通道时关闭式拒绝。
+- 危险工具先调用 `tools/pre-execute` 的 `next()`，保留后续 `deny` 或 `ask`；没有更严格决定时再要求 `ask`，没有审批通道时关闭式拒绝。
+- 工具的原生可读结果必须包含真实目录或业务预览，不只写“已准备”。超限时明确失败，不能截断草稿后仍让用户确认保存。
+- 输入识别覆盖完整规范化内容，不能只对显示摘要计算哈希。相同编号的长文本尾部发生变化，也必须按内容冲突处理。
 - 同一输入串行或并发重放都只产生一次业务副作用，结果哈希一致；每个幂等键使用跨进程原子占位/锁，冲突拒绝覆盖。
+- Windows 短暂锁占用只在检查路径后有界重试，实际取得独占锁才继续。持续 `LOCK_UNAVAILABLE` 要检查并发进程、目录权限与崩溃现场，不删除账本或绕过锁；写入和关闭文件错误不能伪装成锁竞争。
 - 错误使用稳定错误码和恢复提示，失败收据只保留脱敏输出尾部。
 - ZIP 只含安全相对路径、逐文件哈希、归档哈希、外部依赖和回退说明；拒绝盘符、设备名、链接、规范化碰撞、超量成员和展开量。
 - 不写入密钥、令牌、机器绝对路径、`.runtime`、`node_modules`、`work`、`dist` 或缓存。
 - 已知模式扫描不是秘密不存在的证明；发布前还须人工复核业务资料、日志和归档成员。
 - 离线 provider 不证明真实模型可用；真实账号保持独立验收。
+
+从旧 Builder 升级既有项目时保留业务代码与运行数据，按新版本更新受保护工具及基线后重新验证。旧账本中的结果可能因完整输入哈希变化而报告冲突；检查旧结果并决定是否创建新任务，不能清空账本或覆盖原文件来取得通过。
 
 ## 返回格式
 
