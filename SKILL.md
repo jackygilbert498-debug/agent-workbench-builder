@@ -105,7 +105,7 @@ Windows 项目目录尽量靠近磁盘根目录，不要套很多层。打包若
 1. 改写合同声明的领域适配器，让不同能力返回本场景特有的结构化结果。
 2. 把 `fixtures/domain-cases.json` 换成真实代表案例：每条场景、每项能力至少一个正向案例，且至少一个边界/拒绝案例。
 3. 更新合同声明的领域测试，实际执行夹具并核对预期字段、错误码和恢复建议。
-4. 全部行为和测试完成后，才把 `development.stage` 从 `starter` 改为 `domain-adapted`。
+4. 全部行为和测试完成后，才把 `development.stage` 从 `starter` 改为 `domain-adapted`。随后核对 README、AGENTS.md（若存在）和验收说明：当前阶段与合同一致，过去的 NOT-RUN 记录保留时间边界，不能把后补证据倒写成当时已完成。机器毕业不代替这次文档检查。
 
 `builder-provenance.json#starterFileSha256` 保存生成基线。评估器要求所有 critical files 已变化、夹具覆盖完整、夹具实际通过、独立领域收据与 acceptance 一致。只翻转 stage、加注释或改一个哈希都不能毕业。
 

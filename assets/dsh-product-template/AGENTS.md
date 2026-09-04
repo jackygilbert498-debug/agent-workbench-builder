@@ -4,7 +4,7 @@
 - 统一产品目标：__PROJECT_PURPOSE_TEXT__。
 - 主要使用者：__PROJECT_PRIMARY_USER_TEXT__ 等。
 - 能力模块与代表性场景以 `agent_project.json` 为事实源；新增能力必须同时补场景覆盖和测试。
-- 当前生成状态是 `starter`。先改领域适配器、`fixtures/domain-cases.json` 和领域测试，全部通过后才把 stage 改为 `domain-adapted`；不得把模板测试通过写成项目毕业。
+- 当前阶段以 `agent_project.json#development.stage` 为准；脚手架刚生成时为 `starter`。先改领域适配器、`fixtures/domain-cases.json` 和领域测试，全部通过后才把 stage 改为 `domain-adapted`；不得把模板测试通过写成项目毕业。交付前核对 README、产品约束和验收说明，不能留下互相矛盾的当前状态。
 - 输入是用户任务及获准访问的现场；结果必须是可观察工作成果，不是配置、toast 或页面打开。
 - 危险写动作：__PROJECT_DANGEROUS_WRITE_TEXT__ 等，必须经过 DSH 一次性审批。
 - 先调用能力 plan 工具；仅在用户批准后调用对应 commit 工具。

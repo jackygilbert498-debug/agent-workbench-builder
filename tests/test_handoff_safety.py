@@ -321,7 +321,7 @@ class HandoffSafetyTests(unittest.TestCase):
                 with zipfile.ZipFile(archive) as bundle:
                     self.assertFalse(any(name.startswith("handoff/") for name in bundle.namelist()))
                     manifest = json.loads(bundle.read("_handoff/manifest.json"))
-                self.assertEqual(manifest["verificationDependencies"][0]["version"], "4.0.2")
+                self.assertEqual(manifest["verificationDependencies"][0]["version"], "4.0.3")
                 self.assertFalse(manifest["verificationDependencies"][0]["bundled"])
 
     def test_source_race_does_not_replace_previous_good_archive_or_sidecar(self) -> None:

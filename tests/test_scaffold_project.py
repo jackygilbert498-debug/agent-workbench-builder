@@ -252,6 +252,14 @@ class ScaffoldTests(unittest.TestCase):
             )
             self.assertNotIn("__PROJECT_", text)
             self.assertNotIn(str(SKILL_ROOT), text)
+            # Generated instructions must remain true after domain adaptation;
+            # the project contract, not inherited prose, owns current state.
+            agents = (first / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertIn("agent_project.json#development.stage", agents)
+            self.assertNotIn("当前生成状态是 `starter`", agents)
+            readme = (first / "README.md").read_text(encoding="utf-8")
+            self.assertIn("agent_project.json#development.stage", readme)
+            self.assertNotIn("当前 `development.stage=starter`", readme)
             contract = json.loads((first / "agent_project.json").read_text(encoding="utf-8"))
             provenance = json.loads(
                 (first / "builder-provenance.json").read_text(encoding="utf-8")
@@ -267,8 +275,8 @@ class ScaffoldTests(unittest.TestCase):
                 "fixtures/domain-cases.json",
             )
             self.assertEqual(provenance["schema"], "agent-workbench-builder-provenance/v3")
-            self.assertEqual(provenance["builderVersion"], "4.0.2")
-            self.assertEqual(provenance["builderReleaseTag"], "v4.0.2")
+            self.assertEqual(provenance["builderVersion"], "4.0.3")
+            self.assertEqual(provenance["builderReleaseTag"], "v4.0.3")
             self.assertFalse(provenance["builderBundled"])
             self.assertEqual(
                 provenance["builderPublicUrl"],

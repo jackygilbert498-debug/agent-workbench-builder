@@ -18,7 +18,7 @@
 
 1. 在项目之外固定克隆官方 tag `dsh-v0.1.0-rc.8`。它对应 Builder 验证的 commit `141eb6fef83422698aef7a981029e843e8161534`，不是“自动使用最新 DSH”。
 2. 在 DSH 根目录确认 Node `22.x（>=22.19.0）` 或 `>=24`，再依次运行 `corepack enable`、`corepack prepare pnpm@11.7.0 --activate`、`pnpm --version`、`pnpm install --frozen-lockfile`、`pnpm run build`。版本输出必须是 `11.7.0`；首次安装与构建通常需要数分钟和数 GB 空间。
-3. Builder 是验收工具，不在交接 ZIP 内。若接收方没有它，运行 `git clone --branch v4.0.2 --depth 1 https://github.com/jackygilbert498-debug/agent-workbench-builder.git builder-verification`，进入 `builder-verification`，确认 `scripts/scaffold_project.py` 中版本为 `4.0.2`，再运行 `scripts/dsh_doctor.py`。只有官方 origin、固定 tag/commit、完整追踪树字节、clean checkout 与 live config 全部为 `PASS` 才继续。
+3. Builder 是验收工具，不在交接 ZIP 内。若接收方没有它，运行 `git clone --branch v4.0.3 --depth 1 https://github.com/jackygilbert498-debug/agent-workbench-builder.git builder-verification`，进入 `builder-verification`，确认 `scripts/scaffold_project.py` 中版本为 `4.0.3`，再运行 `scripts/dsh_doctor.py`。只有官方 origin、固定 tag/commit、完整追踪树字节、clean checkout 与 live config 全部为 `PASS` 才继续。
 4. 回到本项目，运行本地测试与外部运行时验收。Windows PowerShell：
 
 ```powershell
@@ -54,7 +54,7 @@ python3 tools/run_dsh.py --dsh-root "$DSH_ROOT" web --no-open
 - `src/workflow.mjs` 负责默认拒绝、原子写、幂等账本、冲突拒绝和可追踪收据。
 - `cordis.patch.yml` 是 Product Bundle 层，不修改 DSH 内核。
 
-当前 `development.stage=starter`。模板夹具只能验证工程框架，毕业评估预期为 `PARTIAL`。必须把 `src/capabilities.mjs`、`fixtures/domain-cases.json` 和 `tests/domain-fixtures.test.mjs` 换成目标领域的真实行为，覆盖每条场景、每项能力和至少一个拒绝边界；全部通过后才改为 `domain-adapted`。接入真实模型、账号或第三方工具后，另做真实账号验收。
+当前阶段以 `agent_project.json#development.stage` 为准。脚手架刚生成时为 `starter`，模板夹具只能验证工程框架，毕业评估预期为 `PARTIAL`。必须把 `src/capabilities.mjs`、`fixtures/domain-cases.json` 和 `tests/domain-fixtures.test.mjs` 换成目标领域的真实行为，覆盖每条场景、每项能力和至少一个拒绝边界；全部通过后才改为 `domain-adapted`。交付前同步 README、产品约束和验收说明，区分当前状态与过去测试记录。接入真实模型、账号或第三方工具后，另做真实账号验收。
 
 ## 打包与回退
 
@@ -66,4 +66,4 @@ macOS / Linux 若没有 `python` 命令，把上行改为 `python3`。
 
 Windows 下项目目录尽量短。若报 `PACKAGE_PATH_TOO_LONG`，表示完整交接文件路径超出支持范围；按下述备份与恢复说明换到更短的新位置，再重新验证。不要关闭检查，也不要直接覆盖旧目录。
 
-交接 ZIP 带逐文件与归档 SHA-256，并在 manifest 中把 DSH 与 Builder `4.0.2` 固定 tag 都声明为 `bundled=false`；它排除 DSH、`node_modules`、`.runtime`，并检查已知秘密和机器路径模式。这不是所有秘密都不存在的证明，发布前还需人工复核。回退时先停止 DSH，把现有 `.runtime/` 与 `work/` 在同卷原子改名为带时间戳的隔离备份并记录哈希清单，再把上一份已验证交接包恢复到另一路径。复验通过后才切换入口；在所有者明确确认凭据、会话和业务数据均不再需要之前保留备份。外部 DSH 不参与回退写入。
+交接 ZIP 带逐文件与归档 SHA-256，并在 manifest 中把 DSH 与 Builder `4.0.3` 固定 tag 都声明为 `bundled=false`；它排除 DSH、`node_modules`、`.runtime`，并检查已知秘密和机器路径模式。这不是所有秘密都不存在的证明，发布前还需人工复核。回退时先停止 DSH，把现有 `.runtime/` 与 `work/` 在同卷原子改名为带时间戳的隔离备份并记录哈希清单，再把上一份已验证交接包恢复到另一路径。复验通过后才切换入口；在所有者明确确认凭据、会话和业务数据均不再需要之前保留备份。外部 DSH 不参与回退写入。

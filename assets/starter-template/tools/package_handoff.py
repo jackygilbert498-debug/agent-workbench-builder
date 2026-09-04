@@ -69,8 +69,8 @@ PORTABLE_PATH_EXAMPLES = {
         "/usr/local/opt/node@24/bin/node",
     ),
 }
-BUILDER_VERSION = "4.0.2"
-BUILDER_RELEASE_TAG = "v4.0.2"
+BUILDER_VERSION = "4.0.3"
+BUILDER_RELEASE_TAG = "v4.0.3"
 BUILDER_PUBLIC_URL = "https://github.com/jackygilbert498-debug/agent-workbench-builder"
 
 

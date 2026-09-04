@@ -9,7 +9,7 @@
 先准备 Git、Python 3.12 或 3.13，以及能读写项目、运行命令的编程 AI。把 Builder 和新项目放在两个独立目录。Windows 下尽量少套几层文件夹，项目名称也不要过长。
 
 ```powershell
-git clone --branch v4.0.2 --depth 1 https://github.com/jackygilbert498-debug/agent-workbench-builder.git
+git clone --branch v4.0.3 --depth 1 https://github.com/jackygilbert498-debug/agent-workbench-builder.git
 Set-Location agent-workbench-builder
 python -B scripts/run_tests.py
 ```
@@ -58,7 +58,7 @@ DSH 的源码、依赖和构建产物留在它自己的目录。Builder 不自�
 
 Windows 打包报 `PACKAGE_PATH_TOO_LONG` 时，含义是生成的完整文件路径太长。选择更短的新位置，按项目回退说明保留旧数据并复验，不需要关闭安全检查。
 
-升级已有项目时不要用新模板覆盖整个目录。v4.0.2 修正了审批规则衔接、工具预览、长输入识别与 Windows 短暂文件锁竞争，也更新了打包器；应让 AI 对照新旧文件做局部迁移，再重建测试与交接证据。旧账本出现内容冲突时保留现场，核对后再决定是否建立新任务。
+升级已有项目时不要用新模板覆盖整个目录。v4.0.2 修正了审批规则衔接、工具预览、长输入识别与 Windows 短暂文件锁竞争，也更新了打包器；v4.0.3 进一步澄清模板的阶段说明，要求交付文档与实际状态一致。应让 AI 对照新旧文件做局部迁移，再重建测试与交接证据。旧账本出现内容冲突时保留现场，核对后再决定是否建立新任务。
 
 若持续出现 `LOCK_UNAVAILABLE`，先等待其他任务退出，再检查目录权限和崩溃遗留锁。程序只对短暂占用做有限重试；不要通过删除账本或跳过锁来“修好”它。
 
